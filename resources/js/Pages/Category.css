@@ -1,0 +1,7 @@
+.card-holder{
+    display: grid;
+    grid-template-columns: auto auto auto
+}
+.card{
+    margin:10px
+}
