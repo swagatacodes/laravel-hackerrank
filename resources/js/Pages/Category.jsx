@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import "./Category.css";
 import { useState } from 'react';
+import NavLink from '@/Components/NavLink';
 
 export default function Category({ auth, cats }) {
     const [res, setRes] = useState("");
@@ -20,25 +21,28 @@ export default function Category({ auth, cats }) {
                         <div className='grid grid-cols-3'>
                             {cats.map((e) => {
                                 return (
-
+                                    <NavLink href={route("question_list", {category_id:e.id})} >
                                     <div className="card w-96 bg-primary text-primary-conte">
                                         <div className="card-body">
                                             <h2 className="card-title">{e.id}</h2>
 
                                             <div className="card-actions justify-end">
-                                                <button className="btn" onClick={async () => {
-                                                    var url = new URL("http://localhost:8000/api/ping");
-                                                    url.searchParams.append("command", "echo " + e.id);
-                                                    let x = await fetch(url);
-                                                    let y = await x.text();
-                                                    setRes(y);
-                                                    let id = document.getElementById("my_modal");
-                                                    id.showModal();
-                                                }} >Start</button>
+                                                <button className="btn"
+                                                 //  onClick={async () => {
+                                                    // var url = new URL("http://localhost:8000/api/ping");
+                                                    // url.searchParams.append("command", "echo " + e.id);
+                                                    // let x = await fetch(url);
+                                                    // let y = await x.text();
+                                                    // setRes(y);
+                                                    // let id = document.getElementById("my_modal");
+                                                    // id.showModal();
+                                                // }}
+                                                 >Start</button>
 
                                             </div>
                                         </div>
                                     </div>
+                                    </NavLink>
 
                                 )
                             })}

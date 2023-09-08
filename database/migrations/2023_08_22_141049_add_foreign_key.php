@@ -11,11 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->foreign('id')->references('category_id')->on('problems')->onDelete('cascade');
+        // Schema::table('users', function (Blueprint $table) {
+            
+        // });
+        Schema::table('problems', function (Blueprint $table) {
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
-        Schema::create('problems', function (Blueprint $table) {
-            $table->foreign('id')->references('problemId')->on('testcase')->onDelete('cascade');
+        Schema::table('testcase', function (Blueprint $table) {
+            $table->renameColumn('problen_id', 'problem_id');
+            $table->renameColumn('expectedOutput', 'expected_output');
+            $table->foreign('problem_id')->references('id')->on('problems')->onDelete('cascade');
         });
     }
 
