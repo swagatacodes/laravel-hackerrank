@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
-            //$table->string('id', 30)->primary();
-            $table->foreign('id')
-              ->references('category_id')->on('problems')->onDelete('cascade');
+            $table->string('id', 30)->primary();
+            
         });
     }
 

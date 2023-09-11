@@ -22,7 +22,7 @@ export default function Question_code({ auth, question_data }) {
                     <div className="flex">
                         <button className="btn" onClick={()=> {
                             console.log(currentCode);
-                            // will do some backend call and send teh data to backend to evaluate..
+                            // will do some backend call and send the data to backend to evaluate..
                         }}>Run</button>
                     </div>
                 </div>
