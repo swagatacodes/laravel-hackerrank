@@ -14,12 +14,13 @@ return new class extends Migration
         // Schema::table('users', function (Blueprint $table) {
             
         // });
-        Schema::table('problems', function (Blueprint $table) {
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-        });
+        // Schema::table('problems', function (Blueprint $table) {
+        //     // $table->string('category_id', 30)->change();
+        //     // $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+        // });
         Schema::table('testcase', function (Blueprint $table) {
-            $table->renameColumn('problen_id', 'problem_id');
-            $table->renameColumn('expectedOutput', 'expected_output');
+            // $table->renameColumn('problen_id', 'problem_id');
+            // $table->renameColumn('expectedOutput', 'expected_output');
             $table->foreign('problem_id')->references('id')->on('problems')->onDelete('cascade');
         });
     }

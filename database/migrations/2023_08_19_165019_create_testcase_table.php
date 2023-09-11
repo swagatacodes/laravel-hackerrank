@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('testcase', function (Blueprint $table) {
             $table->id();
-            $table->integer('problem_id');
+            $table->bigInteger('problem_id')->unsigned();
             $table->string('input');
-            $table->string('expectedOutput');
+            $table->string('expected_output');
         });
     }
 
