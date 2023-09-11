@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Testcase;
-use App\Models\Problem;
+
 class Problem extends Model
 {
     public function category(): BelongsTo
@@ -21,6 +21,6 @@ class Problem extends Model
     }
 
     use HasFactory;
-    public $incrementing = false;
+    //public $incrementing = false;
     public $timestamps = false;
 }
