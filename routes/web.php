@@ -6,7 +6,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\Category;
 use App\Models\Problem;
+use App\Models\Submission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,10 +41,19 @@ Route::get('/question_list', function (Request $request) {
     $category_id = $request->query('category_id');
     return Inertia::render('Question_list', ['problems'=> Problem::where('category_id',$category_id)->get()]);
 })->middleware(['auth', 'verified'])->name('question_list');
+Route::get('/submission_list', function (Request $request) {
+    $problem_id = $request->query('problem_id');
+    $user_id = Auth::id();
+    $submissions = Submission::where("problem_id", $problem_id)->where("user_id", $user_id)->get();
+    $problem=Problem::where('id',$problem_id)->first();
+    Log::info("submissions are %s", [$submissions]);
+    return Inertia::render('Submission_list', ['submissions'=> $submissions,'problem'=>$problem]);
+})->middleware(['auth', 'verified'])->name('submission_list');
 Route::get('/question_code', function (Request $request) {
     $q_id = $request->query('qid');
     return Inertia::render('Question_code',['question_data'=> Problem::find($q_id)]);
 })->middleware(['auth', 'verified'])->name('question_code');
+
 
 
 Route::middleware('auth')->group(function () {

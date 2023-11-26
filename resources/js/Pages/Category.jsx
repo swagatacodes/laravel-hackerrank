@@ -22,12 +22,12 @@ export default function Category({ auth, cats }) {
                             {cats.map((e) => {
                                 return (
                                     <NavLink href={route("question_list", {category_id:e.id})} >
-                                    <div className="card w-96 bg-primary text-primary-conte">
+                                    <div className="card w-96 bg-base-200 text-neutral-content">
                                         <div className="card-body">
                                             <h2 className="card-title">{e.id}</h2>
 
                                             <div className="card-actions justify-end">
-                                                <button className="btn"
+                                                <button className="btn bg-neutral"
                                                  //  onClick={async () => {
                                                     // var url = new URL("http://localhost:8000/api/ping");
                                                     // url.searchParams.append("command", "echo " + e.id);
