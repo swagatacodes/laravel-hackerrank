@@ -11,7 +11,7 @@ export default function Question_code({ auth, question_data }) {
     const [submissionResult, setSubmissionResult] = useState();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selecedLanguage, setSelectedLanguage] = useState('Python 3');
-    const LOCAL_SOURCE_CODE_KEY = `soure_code_for_problem_${question_data.id}`;
+    const LOCAL_SOURCE_CODE_KEY = `soure_code_for_problem_${question_data.id}_for_${selecedLanguage}`;
     const languages = [
         { id: 92, name: "Python 3" ,monacolanguageid:'python'},
         { id: 62, name: "Java" ,monacolanguageid:'java'},
@@ -21,10 +21,20 @@ export default function Question_code({ auth, question_data }) {
         { id: 54, name: "C++" ,monacolanguageid:'cpp'},
         { id: 46, name: "Shell" ,monacolanguageid:'shell'},
     ]
+    useEffect(()=>{
+        const lastusedlang=localStorage.getItem("language");
+        if (lastusedlang){
+            setSelectedLanguage(lastusedlang);
+        }
+        
+    },[])
     useEffect(() => {
         const source_code = localStorage.getItem(LOCAL_SOURCE_CODE_KEY);
         setCurrentCode(source_code);
-    }, [])
+        localStorage.setItem('language',selecedLanguage);
+
+    }, [selecedLanguage])
+    
 
     return (
         <AuthenticatedLayout
