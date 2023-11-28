@@ -8,7 +8,8 @@ export default function Submission_list({ submissions, problem }) {
             {/* <div>{JSON.stringify(submissions)}</div> */}
             <div className="p-10">
                 <h2 className="text-3xl">{problem.title}</h2>
-                <h3>{problem.description}</h3>
+                <h3><div dangerouslySetInnerHTML={{__html: problem.description}}></div></h3>
+                
             </div>
             <div className="overflow-x-auto">
                 <table className="table">
