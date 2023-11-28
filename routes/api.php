@@ -20,29 +20,36 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user',function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('/ping', function (Request $request) {
     $n = $request->query('command');
-    $out=shell_exec($n);
+    $out = shell_exec($n);
     return $out;
 });
 
-Route::middleware('auth:sanctum')->post('/startevaluation',function(Request $request){
+Route::middleware('auth:sanctum')->post('/startevaluation', function (Request $request) {
     Log::info(auth()->user());
-    $client = new \GuzzleHttp\Client(['verify'=>false]);
-    $var=$request->json()->all();
-    $testcaseinfo=Testcase::where("problem_id",$var['problem_id'])->get();
+    $client = new \GuzzleHttp\Client(['verify' => false]);
+    $var = $request->json()->all();
+    $testcaseinfo = Testcase::where("problem_id", $var['problem_id'])->get();
+    $evaluation_infos = [];
     Log::info($testcaseinfo);
-    $evaluation_info = array("language_id"=>$var['language_id'],
-    "problem_id"=>$var['problem_id'], 
-    "source_code"=>$var['source_code'],
-     "stdin"=>$testcaseinfo[0]['input'],
-    "expected_output"=>$testcaseinfo[0]['expected_output']);
-    Log::info($evaluation_info);
-    $response = $client->request('POST', 'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&fields=*', [
-        'body' =>json_encode($evaluation_info),
+    foreach ($testcaseinfo as $eachtestcase) {
+        $evaluation_info = array(
+            "language_id" => $var['language_id'],
+            "problem_id" => $var['problem_id'],
+            "source_code" => $var['source_code'],
+            "stdin" => $eachtestcase['input'],
+            "expected_output" => $eachtestcase['expected_output']
+        );
+        array_push($evaluation_infos, $evaluation_info);
+    }
+
+    Log::info($eachtestcase);
+    $response = $client->request('POST', 'https://judge0-ce.p.rapidapi.com/submissions/batch?base64_encoded=false&fields=*', [
+        'body' => json_encode(["submissions" => $evaluation_infos]),
         'headers' => [
             'Content-Type' => 'application/json',
             'X-RapidAPI-Host' => 'judge0-ce.p.rapidapi.com',
@@ -50,15 +57,18 @@ Route::middleware('auth:sanctum')->post('/startevaluation',function(Request $req
             'content-type' => 'application/json',
         ],
     ]);
-    
+
 
     $data = json_decode($response->getBody(), true);
-    $token = $data['token'];
-    Log::info($token);
+    $tokens = [];
+    foreach ($data as $token) {
+        array_push($tokens, $token["token"]);
+    }
+    Log::info($tokens);
     Log::info($var);
-    
-    $url='https://judge0-ce.p.rapidapi.com/submissions/'. $token .'?base64_encoded=false&fields=*';
-    do{
+    $csTokens = implode(",", $tokens);
+    $url = 'https://judge0-ce.p.rapidapi.com/submissions/batch?tokens=' . $csTokens . '&base64_encoded=false&fields=*';
+    do {
         $response = $client->request('GET', $url, [
             'headers' => [
                 'X-RapidAPI-Host' => 'judge0-ce.p.rapidapi.com',
@@ -66,38 +76,55 @@ Route::middleware('auth:sanctum')->post('/startevaluation',function(Request $req
             ],
         ]);
         Log::info("calling second api");
-        $evalres= json_decode($response->getBody(),true);
+        $evalresults = json_decode($response->getBody(), true);
+        Log::info("evalresults is:");
+        Log::info($evalresults);
+        $all_finished = true;
+        foreach ($evalresults["submissions"] as $evalresult){
+            if ($evalresult['finished_at']== NULL){
+                $all_finished=false;
+                break;
+            }
+        }
         Log::info("second api res:");
-        Log::info($evalres);
+        Log::info($evalresults);
         sleep(3);
-    }while($evalres['finished_at']==NULL);
+    } while (!$all_finished);
 
     $user_id = Auth::id();
 
-    if ($evalres['status_id']==1 or $evalres['status_id']==2){
-        $status="Pending";
+    $status = "Success";
+    $passed_count = 0;
+    $total_cases=0;
+    foreach ($evalresults["submissions"] as $evalresult){
+        $total_cases+=1;
+    if ($evalresult['status_id'] == 1 or $evalresult['status_id'] == 2) {
+        $status = "Pending";
+        break;
+    } else if ($evalresult['status_id'] > 3) {
+        $status = "Failed";
+        break;
+    } else if($evalresult['status_id']==2){
+        $passed_count+=1;
     }
-    else if ($evalres['status_id']==3){
-        $status="Success";
-    }
-    else{
-        $status="Failed";
-    }
-    $data_to_store = ['user_id'=> $user_id,
-    'problem_id'=> $var['problem_id'],
-    'language_id'=>$evalres['language_id'],
-    'status'=>$status,
-    'testcase_id'=>$testcaseinfo[0]['id'],
-    'stdout'=>$evalres['stdout'],
-    'stderr'=>$evalres['stderr'],
-    'submitted_code'=>$evalres['source_code'],
-    'time'=>$evalres['time'],
-    "memory"=>$evalres['memory'],
-    'token'=>$evalres['token']];
+}
+    $data_to_store = [
+        'user_id' => $user_id,
+        'problem_id' => $var['problem_id'],
+        'language_id' => $evalresult['language_id'],
+        'status' => $status,
+        'stdout' => $evalresult['stdout'],
+        'stderr' => $evalresult['stderr'],
+        'submitted_code' => $evalresult['source_code'],
+        'time' => $evalresult['time'],
+        "memory" => $evalresult['memory'],
+        'token' => $evalresult['token'],
+        'passed_count' => $passed_count,
+        'total_case_checked'=> $total_cases
+    ];
     Submission::create($data_to_store);
-
-    $data_to_store["expected_output"] = $evalres["expected_output"];
+    Log::info($data_to_store);
+    Log::info('data_to_store:');
+    $data_to_store["expected_output"] = $evalresult["expected_output"];
     return $data_to_store;
 });
-
-

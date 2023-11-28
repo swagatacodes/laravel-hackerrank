@@ -18,7 +18,7 @@ export default function Submission_list({ submissions, problem }) {
                             <th>ID</th>
                             <th>LANGUAGE ID</th>
                             <th>STATUS</th>
-                            <th>TESTCASE ID</th>
+                            <th>CREATED AT</th>
                             <th>TIME</th>
                             <th>MEMORY</th>
                         </tr>
@@ -31,7 +31,7 @@ export default function Submission_list({ submissions, problem }) {
                                     <th>{each.id}</th>
                                     <td>{each.language_id}</td>
                                     <td>{each.status}</td>
-                                    <td>{each.testcase_id}</td>
+                                    <td>{each.created_at.substring(0,10)}</td>
                                     <td>{each.time}</td>
                                     <td>{each.memory}</td>
                                 </tr>

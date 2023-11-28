@@ -12,7 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
+use Filament\Forms\Components\RichEditor;
 
 class ProblemResource extends Resource
 {
@@ -25,7 +25,7 @@ class ProblemResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('title'),
-                Forms\Components\TextInput::make('description'),
+                Forms\Components\RichEditor::make('description'),
                 Forms\Components\Select::make('difficulty')
                 ->options([
                     'easy' => 'easy',

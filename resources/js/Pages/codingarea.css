@@ -1,4 +1,14 @@
-.dropdown dropdown-hover{
+.dropdown-holder{
     display: flex;
-    margin-left: 550px;
+    justify-content: end;
 }
+.code-holder{
+    display: flex;
+    height: 80%;
+}
+
+/* .rich-text h2 {
+    font-size: 1.5rem !important;
+    line-height: 3rem;
+}
+ */
